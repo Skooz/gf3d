@@ -15,7 +15,7 @@ int main(int argc,char *argv[])
 {
     int done = 0;
     int a;
-    Uint8 validate = 0;
+    Uint8 validate = 1;
     const Uint8 * keys;
     Uint32 bufferFrame = 0;
     VkCommandBuffer commandBuffer;
