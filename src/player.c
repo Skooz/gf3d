@@ -2,6 +2,7 @@
 
 #include "player.h"
 
+
 void player_think(Entity *self)
 {
 	
@@ -10,29 +11,32 @@ void player_think(Entity *self)
 
 	if (keys[SDL_SCANCODE_W]) // Forward
 	{
-		self->position.y -= (float)0.01;
+		self->position.y -= 0.01;
 	}
 	if (keys[SDL_SCANCODE_S]) // Backward
 	{
-		self->position.y += (float)0.01;
+		self->position.y += 0.01;
 	}
 	if (keys[SDL_SCANCODE_A]) // Left
 	{
-		self->position.x += (float)0.01;
+		self->position.x += 0.01;
 	}
 	if (keys[SDL_SCANCODE_D]) // Right
 	{
-		self->position.x -= (float)0.01;
+		self->position.x -= 0.01;
 	}
 	if (keys[SDL_SCANCODE_R]) // Up
 	{
-		self->position.z += (float)0.01;
+		self->position.z += 0.01;
 	}
 	if (keys[SDL_SCANCODE_F]) // Down
 	{
-		self->position.z -= (float)0.01;
+		self->position.z -= 0.01;
 	}
+
 	gfc_matrix_make_translation(self->modelMatrix, self->position);
+
+	//slog("x%f, y%f, z%f", self->position.x, self->position.y, self->position.z);
 
 	/*
 	Entity *ent;
@@ -83,26 +87,26 @@ void player_think(Entity *self)
 
 }
 
-Entity *player_spawn(Vector3D position, const char *modelName)
+Entity *player_spawn(Vector3D pos, const char *modelName)
 {
-	Entity *ent;
+	Entity *self;
 	
-	ent = gf3d_entity_new();
-	if (!ent)
+	self = gf3d_entity_new();
+	if (!self)
 	{
 		slog("failed to spawn a new player entity");
 		return NULL;
 	}
 
 	// Load model
-	ent->model = gf3d_model_load(modelName);
+	self->model = gf3d_model_load(modelName);
 
 	// Set position
-	vector3d_copy(ent->position, position);
-	gfc_matrix_make_translation(ent->modelMatrix, ent->position);
+	vector3d_copy(self->position, pos);
+	gfc_matrix_make_translation(self->modelMatrix, self->position);
 
 	// Set think
-	ent->think = player_think;
+	self->think = player_think;
 }
 
 

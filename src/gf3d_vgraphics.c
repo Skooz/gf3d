@@ -657,6 +657,7 @@ uint32_t gf3d_vgraphics_find_memory_type(uint32_t typeFilter, VkMemoryPropertyFl
     return 0;
 }
 
+// Rotate Camera
 void gf3d_vgraphics_rotate_camera(float degrees)
 {
     gfc_matrix_rotate(
@@ -664,8 +665,23 @@ void gf3d_vgraphics_rotate_camera(float degrees)
         gf3d_vgraphics.ubo.view,
         degrees,
         vector3d(0,0,1));
-
 }
+
+// Move Camera
+void gf3d_vgraphics_move_camera(Vector3D move)
+{
+	Vector3D thirdperson = move;
+	thirdperson.y -= 45;
+	thirdperson.z += 25;
+
+	gfc_matrix_view(
+		gf3d_vgraphics.ubo.view,
+		thirdperson,
+		move,
+		vector3d(0, 0, 1)
+		);
+}
+
 
 Pipeline *gf3d_vgraphics_get_graphics_pipeline()
 {

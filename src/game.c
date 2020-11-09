@@ -58,7 +58,6 @@ int main(int argc,char *argv[])
 
 
 	Entity *player = player_spawn(vector3d(0,0,0), "sword");
-
 	Entity *level = level_spawn(vector3d(0, 0, -1), "level");
 
 
@@ -85,26 +84,15 @@ int main(int argc,char *argv[])
 
 		//update game things here
 
-		// ROTATION
-		/*
-		gfc_matrix_rotate(
-        gf3d_vgraphics.ubo.view,
-        gf3d_vgraphics.ubo.view,
-        degrees,
-        vector3d(0,0,1));
-		*/
-		gf3d_vgraphics_rotate_camera(0);
-
 		// Entities
 		gf3d_entity_think_all();
 
-		/*
-		gfc_matrix_rotate(
-            modelMat2,
-            modelMat2,
-            0.002,
-            vector3d(0,0,1));
-		*/
+
+		gf3d_vgraphics_rotate_camera(0);
+		// x,y,z
+		gf3d_vgraphics_move_camera(player->position);
+
+
 
         // configure render command for graphics command pool
         // for each mesh, get a command and configure it from the pool

@@ -3,6 +3,6 @@
 
 #include "gf3d_entity.h"
 
-Entity *player_spawn(Vector3D position, const char *modelname);
+Entity *player_spawn(Vector3D pos, const char *modelname);
 
 #endif
