@@ -1,23 +1,24 @@
 #ifndef __GF3D_ENTITY_H__
 #define __GF3D_ENTITY_H__
 
+#include "stdio.h"
 #include "gfc_types.h"
 #include "gfc_matrix.h"
 
 #include "gf3d_model.h"
 
+
 /**
  * @purpose this is the file to access the entity management system
  */
-
 typedef struct Entity_S
 {
 	Uint8		_inuse; /**<flag to make sure entities are not re-assigned while active*/
 	Vector3D	position;
 	Model		*model;
 	Matrix4		modelMatrix;
-	//void		(*update)(struct Entity_S *self);
 	void		(*think)(struct Entity_S *self);
+	//void		(*update)(struct Entity_S *self);
 	//void		(*touch)(struct Entity_S *self, struct Entity_S *other);
 	//void		(*die)(struct Entity_S *self);
 	Uint32		delay;
@@ -39,11 +40,11 @@ Entity *gf3d_entity_new();
 
 
 /**
- * @brief queues up the entity to be drawn for the given draw command
- * @param self the entity to draw
- * @param bufferFrame the renderFrame to draw with
- * @param commandBuffer the command to populate with this draw command
- */
+* @brief queues up the entity to be drawn for the given draw command
+* @param self the entity to draw
+* @param bufferFrame the renderFrame to draw with
+* @param commandBuffer the command to populate with this draw command
+*/
 void gf3d_entity_draw(Entity *self, Uint32 bufferFrame, VkCommandBuffer commandBuffer);
 
 
