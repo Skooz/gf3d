@@ -57,40 +57,31 @@ int main(int argc,char *argv[])
 	slog_sync();
 
 
-	Entity *player = player_spawn(vector3d(0,0,0), "sword");
-	Entity *level = level_spawn(vector3d(0, 0, -1), "level");
-
-
-	// dino stuff
-	/*model = gf3d_model_load("dino");
-	gfc_matrix_identity(modelMat);
-	model2 = gf3d_model_load("dino");
-    gfc_matrix_identity(modelMat2);
-    gfc_matrix_make_translation(
-            modelMat2,
-            vector3d(10,0,0)
-        );*/
-
 	Uint32 mouse;
+
+	Entity *player = player_spawn(vector3d(1,0,0), "sword");
+	Entity *level = level_spawn(vector3d(0, 0, -5), "level");
+
+	Vector3D OldPos;
 
 	int x, y;
     while(!done)
     {
         SDL_PumpEvents();   // update SDL's internal event structures
+
         keys = SDL_GetKeyboardState(NULL); // get the keyboard state for this frame
-        
 		mouse = SDL_GetMouseState(&x, &y);
 		//slog("%i", num2);
 
 		//update game things here
-
 		// Entities
 		gf3d_entity_think_all();
 
+		// Camera
+		//
+		
 
-		gf3d_vgraphics_rotate_camera(0);
-		// x,y,z
-		gf3d_vgraphics_move_camera(player->position);
+		//slog("x%f, y%f, z%f", player->position.x, player->position.y, player->position.z);
 
 
 
@@ -101,8 +92,6 @@ int main(int argc,char *argv[])
             commandBuffer = gf3d_command_rendering_begin(bufferFrame);
 
 				gf3d_entity_draw_all(bufferFrame, commandBuffer);
-                //gf3d_model_draw(model,bufferFrame,commandBuffer,modelMat);
-                //gf3d_model_draw(model2,bufferFrame,commandBuffer,modelMat2);
                 
             gf3d_command_rendering_end(commandBuffer);
             

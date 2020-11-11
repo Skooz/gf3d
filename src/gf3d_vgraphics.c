@@ -116,7 +116,7 @@ void gf3d_vgraphics_init(
         45 * GFC_DEGTORAD,
         renderWidth/(float)renderHeight,
         0.1f,
-        300 // viewdistance?
+        1000 // viewdistance?
     );
     
     gf3d_vgraphics.ubo.proj[1][1] *= -1;
@@ -670,18 +670,17 @@ void gf3d_vgraphics_rotate_camera(float degrees)
 // Move Camera
 void gf3d_vgraphics_move_camera(Vector3D move)
 {
-	Vector3D thirdperson = move;
-	thirdperson.y -= 45;
-	thirdperson.z += 25;
+	Vector3D camPosition = move;
+	camPosition.y -= 15;
+	//camPosition.z += 2;
 
 	gfc_matrix_view(
 		gf3d_vgraphics.ubo.view,
-		thirdperson,
+		camPosition,
 		move,
 		vector3d(0, 0, 1)
 		);
 }
-
 
 Pipeline *gf3d_vgraphics_get_graphics_pipeline()
 {
