@@ -658,11 +658,16 @@ uint32_t gf3d_vgraphics_find_memory_type(uint32_t typeFilter, VkMemoryPropertyFl
 }
 
 // Rotate Camera
-void gf3d_vgraphics_rotate_camera(float degrees)
+void gf3d_vgraphics_rotate_camera(float degrees, Vector3D position)
 {
+
+	Matrix4 pos;
+	gfc_matrix_make_translation(pos, position);
+	//gfc_matrix_multiply(gf3d_vgraphics.ubo.view, pos);
+
     gfc_matrix_rotate(
-        gf3d_vgraphics.ubo.view,
-        gf3d_vgraphics.ubo.view,
+		pos,
+		gf3d_vgraphics.ubo.view,
         degrees,
         vector3d(0,0,1));
 }

@@ -2,6 +2,8 @@
 
 #include "gf3d_entity.h"
 
+#include "collision.h"
+
 typedef struct
 {
 	Entity	*entity_list;	//**<My big fat fuckin' list of really dumb entities*/
@@ -76,6 +78,7 @@ void gf3d_entity_think(Entity *self)
 	if (!self->think) return; // no think function to call
 
 	self->think(self);
+	gf3d_entity_collide_check(self);
 }
 
 void gf3d_entity_think_all()
@@ -105,6 +108,29 @@ void gf3d_entity_draw_all(Uint32 bufferFrame, VkCommandBuffer commandBuffer)
 	{
 		if (!gf3d_entity.entity_list[i]._inuse) continue;
 		gf3d_entity_draw(&gf3d_entity.entity_list[i], bufferFrame, commandBuffer);
+	}
+}
+
+void gf3d_entity_collide(Entity *e1, Entity *e2)
+{
+	if (collide_circle(e1->position, e1->radius, e2->position, e2->radius))
+	{
+		if (e1->touch)
+		{	
+			e1->touch(e1, e2);
+		}
+	}
+}
+
+void gf3d_entity_collide_check(Entity *ent)
+{
+	int i;
+	if (!ent) return;
+	for (i = 0; i < gf3d_entity.entity_count; i++)
+	{
+		if (!gf3d_entity.entity_list[i]._inuse) continue;
+		if (&gf3d_entity.entity_list[i] == ent) continue;
+		gf3d_entity_collide(ent, &gf3d_entity.entity_list[i]);
 	}
 }
 

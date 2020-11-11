@@ -59,8 +59,16 @@ int main(int argc,char *argv[])
 
 	Uint32 mouse;
 
-	Entity *player = player_spawn(vector3d(1,0,0), "sword");
+	Entity *player = player_spawn(vector3d(0,-400,0), "sword");
 	Entity *level = level_spawn(vector3d(0, 0, -5), "level");
+
+	
+	Entity *m1, *m2, *m3, *m4, *m5;
+	m1 = monster_spawn(vector3d(-30,-380,0), "cone", 1);
+	m2 = monster_spawn(vector3d(-20, -360, 0), "cube", 2);
+	m3 = monster_spawn(vector3d(0, -350, 1), "diamond", 3);
+	m4 = monster_spawn(vector3d(20, -330, 0), "sphere", 4);
+	m5 = monster_spawn(vector3d(40, -320, 0), "tube", 5);
 
 	Vector3D OldPos;
 

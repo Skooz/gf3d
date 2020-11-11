@@ -1,6 +1,7 @@
 #include "simple_logger.h"
 #include "gf3d_vgraphics.h"
 #include "player.h"
+#include "collision.h"
 
 
 void player_think(Entity *self)
@@ -11,23 +12,25 @@ void player_think(Entity *self)
 
 	if (keys[SDL_SCANCODE_W]) // Forward
 	{
-		self->position.y += 0.01;
+		self->velocity.y += 0.01;
+		gf3d_vgraphics_move_camera(self->position);
 	}
 	if (keys[SDL_SCANCODE_S]) // Backward
 	{
-		self->position.y -= 0.01;
+		self->velocity.y -= 0.01;
+		gf3d_vgraphics_move_camera(self->position);
 	}
 	if (keys[SDL_SCANCODE_A]) // Left
 	{
-		self->position.x -= 0.01;
-
+		self->velocity.x -= 0.01;
+		gf3d_vgraphics_move_camera(self->position);
 		//gf3d_vgraphics_rotate_camera(-0.001);
 		//self->rotation.x += 0.01;
 	}
 	if (keys[SDL_SCANCODE_D]) // Right
 	{
-		self->position.x += 0.01;
-
+		self->velocity.x += 0.01;
+		gf3d_vgraphics_move_camera(self->position);
 		//gf3d_vgraphics_rotate_camera(0.001);
 		//self->rotation.x -= 0.01;
 	}
@@ -40,11 +43,24 @@ void player_think(Entity *self)
 	{
 		//self->position.z -= 0.01;
 		self->rotation.x -= 1;
+		//gf3d_vgraphics_rotate_camera(-0.001, self->position);
 	}
 
-	vector3d_add(self->position, self->position, self->velocity);
+	if (vector3d_magnitude(self->velocity) > 0.001)
+	{
+		vector3d_add(self->position, self->position, self->velocity);
+		vector3d_scale(self->velocity, self->velocity, 0.1);
+	}
+	else
+	{
+		if (vector3d_magnitude(self->velocity) < 0.001)
+		{
+			vector3d_clear(self->velocity);
+		}
+
+	}
 	
-	/*
+	
 	Matrix4 move, rotation, temp;
 	gfc_matrix_identity(self->modelMatrix);
 	gfc_matrix_rotate(
@@ -64,10 +80,8 @@ void player_think(Entity *self)
 		vector3d(0, 0, 1));
 	gfc_matrix_make_translation(move, self->position);
 	gfc_matrix_multiply(self->modelMatrix, move, rotation);
-	*/
+	/**/
 
-	gf3d_vgraphics_move_camera(self->position);
-	//gf3d_vgraphics_rotate_camera(-0.001);
 
 	Vector3D WeaponPos = self->position;
 	WeaponPos.y -= 12;
@@ -125,6 +139,50 @@ void player_think(Entity *self)
 
 }
 
+void player_touch(Entity *self, Entity *other)
+{
+	if (!self || !other) return;
+
+	slog("collision");
+
+	//vector3d_copy(self->position, vector3d(0, -400, 0));
+}
+
+
+/*
+Uint8 object_bounds(Vector3D center, float radius, Vector2D *normal)
+{
+	Uint8 hit = 0;
+
+	if (center.x - radius < level->bounds.x)
+	{
+		hit = 1;
+		if (normal)normal->x = 1;
+	}
+	if (center.y - radius < level->bounds.y)
+	{
+		hit = 1;
+		if (normal)normal->y = 1;
+	}
+	if (center.x + radius > level->bounds.x + level->bounds.w)
+	{
+		hit = 1;
+		if (normal)normal->x = -1;
+	}
+	if (center.y + radius > level->bounds.y + level->bounds.h)
+	{
+		hit = 1;
+		if (normal)normal->y = -1;
+	}
+	if ((hit) && (normal))
+	{
+		vector2d_normalize(normal);
+	}
+	return hit;
+}
+*/
+
+
 Entity *player_spawn(Vector3D pos, const char *modelName)
 {
 	Entity *self;
@@ -139,16 +197,21 @@ Entity *player_spawn(Vector3D pos, const char *modelName)
 	// Load model
 	self->model = gf3d_model_load(modelName);
 
+	self->radius = 3;
+
 	// Set vectors
 	vector3d_copy(self->position, pos);
 	vector3d_set(self->rotation, 0, 0, 0);
 
+	// Set init camera pos
 	gf3d_vgraphics_move_camera(self->position);
-
 	gfc_matrix_make_translation(self->modelMatrix, self->position);
 
 	// Set think
 	self->think = player_think;
+
+	// Set touch
+	self->touch = player_touch;
 
 	return self;
 }

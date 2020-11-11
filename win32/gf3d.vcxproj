@@ -102,6 +102,7 @@
     <ClInclude Include="..\gfc\simple_json\include\simple_json_string.h" />
     <ClInclude Include="..\gfc\simple_json\include\simple_json_value.h" />
     <ClInclude Include="..\gfc\simple_logger\include\simple_logger.h" />
+    <ClInclude Include="..\include\collision.h" />
     <ClInclude Include="..\include\gf3d_camera.h" />
     <ClInclude Include="..\include\gf3d_commands.h" />
     <ClInclude Include="..\include\gf3d_entity.h" />
@@ -114,6 +115,7 @@
     <ClInclude Include="..\include\gf3d_vgraphics.h" />
     <ClInclude Include="..\include\gf3d_vqueues.h" />
     <ClInclude Include="..\include\level.h" />
+    <ClInclude Include="..\include\monster.h" />
     <ClInclude Include="..\include\player.h" />
   </ItemGroup>
   <ItemGroup>
@@ -133,6 +135,7 @@
     <ClCompile Include="..\gfc\src\gfc_text.c" />
     <ClCompile Include="..\gfc\src\gfc_types.c" />
     <ClCompile Include="..\gfc\src\gfc_vector.c" />
+    <ClCompile Include="..\include\collision.c" />
     <ClCompile Include="..\src\game.c" />
     <ClCompile Include="..\src\gf3d_camera.c" />
     <ClCompile Include="..\src\gf3d_commands.c" />
@@ -149,6 +152,7 @@
     <ClCompile Include="..\src\gf3d_vgraphics.c" />
     <ClCompile Include="..\src\gf3d_vqueues.c" />
     <ClCompile Include="..\src\level.c" />
+    <ClCompile Include="..\src\monster.c" />
     <ClCompile Include="..\src\player.c" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

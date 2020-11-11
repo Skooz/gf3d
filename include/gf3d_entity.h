@@ -19,15 +19,24 @@ typedef struct Entity_S
 	Vector3D	velocity;
 	Vector3D	rotation;
 
+	float		radius;	// For collisions
+
+	int			monsterType;
+	
+	Uint32 nextMove;
+	int moveDir;
+
 	Model		*model;
 	Matrix4		modelMatrix;
 	void		(*think)(struct Entity_S *self);
 	//void		(*update)(struct Entity_S *self);
-	//void		(*touch)(struct Entity_S *self, struct Entity_S *other);
+	void		(*touch)(struct Entity_S *self, struct Entity_S *other);
 	//void		(*die)(struct Entity_S *self);
 	Uint32		delay;
 }Entity;
 
+
+void gf3d_entity_collide_check(Entity *ent);
 
 /**
  * @brief initializes the internal structures for managing the entity system
