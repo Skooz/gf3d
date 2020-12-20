@@ -15,42 +15,67 @@ typedef struct Entity_S
 {
 	Uint8		_inuse; /**<flag to make sure entities are not re-assigned while active*/
 	
+	// General
 	Vector3D	position;
 	Vector3D	velocity;
 	Vector3D	rotation;
-
-	float		radius;	// For collisions
-
-	int			monsterType;
-	
-	Uint32 nextMove;
-	int moveDir;
-
+	float		radius;
 	Model		*model;
 	Matrix4		modelMatrix;
-	void		(*think)(struct Entity_S *self);
-	//void		(*update)(struct Entity_S *self);
-	void		(*touch)(struct Entity_S *self, struct Entity_S *other);
+	void(*think)(struct Entity_S *self);
+	void(*touch)(struct Entity_S *self, struct Entity_S *other);
 	//void		(*die)(struct Entity_S *self);
+	//void		(*update)(struct Entity_S *self);
 	Uint32		delay;
+
+	// Player 
+	float rotHeight;
+	float rotCurrent;
+	float rotTarget;
+	
+	int health;
+	int mana;
+	int stamina;
+
+
+
+	// Monsters
+	int			monsterType;
+	Uint32		nextMove;
+	int			moveDir;
+
 }Entity;
 
 
-void gf3d_entity_collide_check(Entity *ent);
+void gf3d_entity_close();
 
 /**
  * @brief initializes the internal structures for managing the entity system
- * @param maxEntities will be the maximum number of concurrent entities that will be supported
+ * @param maxEntities the maximum number of concurrent entities to be supported
  */
 void gf3d_entity_init(Uint32 maxEntities);
 
 
 /**
- * @brief search for an empty entitty slot and returna  pointer to the blank entity
+* @brief  free an entity so it can be reused by the system
+* @param self  the entity to free
+* @note  the pointer should be set to zero and no longer used
+*/
+void gf3d_entity_free(Entity *entity);
+
+/**
+ * @brief search for an empty entity slot and returna  pointer to the blank entity
  * @param NULL on error or a pointer to an entity otherwise
  */
 Entity *gf3d_entity_new();
 
+
+void gf3d_entity_think(Entity *self);
+
+/**
+* @brief call think function for all active entities
+*/
+void gf3d_entity_think_all();
 
 /**
 * @brief queues up the entity to be drawn for the given draw command
@@ -69,17 +94,9 @@ void gf3d_entity_draw(Entity *self, Uint32 bufferFrame, VkCommandBuffer commandB
 void gf3d_draw_all(Uint32 bufferFrame, VkCommandBuffer commandBuffer);
 
 
-/**
-* @brief call think function for all active entities
-*/
-void gf3d_entity_think_all();
+void gf3d_entity_collide(Entity *e1, Entity *e2);
 
 
-/**
- * @brief free an entity so it can be reused by the system
- * @param self the entity to free
- * @note the pointer should be set to zero and no longer used
- */
-void gf3d_entity_free(Entity *entity);
+void gf3d_entity_collide_check(Entity *ent);
 
 #endif

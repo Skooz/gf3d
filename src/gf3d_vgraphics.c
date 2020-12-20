@@ -666,7 +666,7 @@ void gf3d_vgraphics_rotate_camera(float degrees, Vector3D position)
 	//gfc_matrix_multiply(gf3d_vgraphics.ubo.view, pos);
 
     gfc_matrix_rotate(
-		pos,
+		gf3d_vgraphics.ubo.view,
 		gf3d_vgraphics.ubo.view,
         degrees,
         vector3d(0,0,1));
@@ -685,6 +685,18 @@ void gf3d_vgraphics_move_camera(Vector3D move)
 		move,
 		vector3d(0, 0, 1)
 		);
+}
+
+gf3d_vgraphics_setubo(Matrix4 current)
+{
+	/*slog("======================");
+	gfc_matrix_slog(current);
+	slog("----------------------");
+	gfc_matrix_slog(gf3d_vgraphics.ubo.view);
+	slog("======================");*/
+	gfc_matrix_copy(
+		gf3d_vgraphics.ubo.view,
+		current);
 }
 
 Pipeline *gf3d_vgraphics_get_graphics_pipeline()

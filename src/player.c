@@ -4,91 +4,83 @@
 #include "collision.h"
 
 
+void player_update_camera(Vector3D move, Vector3D rotate)
+{
+	gf3d_camera_update(move, rotate);
+}
+
 void player_think(Entity *self)
 {
 	// Movement
 	Uint8 *keys;
 	keys = SDL_GetKeyboardState(NULL);
 
+	Vector3D move = vector3d(keys[SDL_SCANCODE_D] - keys[SDL_SCANCODE_A], keys[SDL_SCANCODE_W] - keys[SDL_SCANCODE_S], 0);
+	Vector2D forward;
+	//rotate the forward direction based on current rotation
+	forward.x = (move.x * SDL_cosf(self->rotCurrent)) - (move.y * SDL_sinf(self->rotCurrent));
+	forward.y = (move.x * SDL_sinf(self->rotCurrent)) + (move.y * SDL_cosf(self->rotCurrent));
+	
+	self->position.x -= forward.x * 0.02;
+	self->position.y -= forward.y * 0.02;
+
+	//self->rotCurrent = SDL_fmodf(self->rotCurrent, 6.28319);
+	player_update_camera(vector3d(self->position.x, self->position.y, self->position.z), vector3d(0, self->rotHeight, self->rotCurrent));
+
 	if (keys[SDL_SCANCODE_W]) // Forward
 	{
-		self->velocity.y += 0.01;
-		gf3d_vgraphics_move_camera(self->position);
+		//self->velocity.y += 0.01;
 	}
 	if (keys[SDL_SCANCODE_S]) // Backward
 	{
-		self->velocity.y -= 0.01;
-		gf3d_vgraphics_move_camera(self->position);
+		//self->velocity.y -= 0.01;
 	}
 	if (keys[SDL_SCANCODE_A]) // Left
 	{
-		self->velocity.x -= 0.01;
-		gf3d_vgraphics_move_camera(self->position);
-		//gf3d_vgraphics_rotate_camera(-0.001);
-		//self->rotation.x += 0.01;
+		//self->velocity.x -= 0.01;
+		self->rotCurrent += 0.0015;
+		self->rotation.z += 0.0015;
 	}
 	if (keys[SDL_SCANCODE_D]) // Right
 	{
-		self->velocity.x += 0.01;
-		gf3d_vgraphics_move_camera(self->position);
-		//gf3d_vgraphics_rotate_camera(0.001);
-		//self->rotation.x -= 0.01;
+		//self->velocity.x += 0.01;
+		self->rotCurrent -= 0.0015;
+		self->rotation.z -= 0.0015;
 	}
 	if (keys[SDL_SCANCODE_R]) // Up
 	{
-		//self->position.z += 0.01;
-		self->rotation.z -= 1;
+		
 	}
 	if (keys[SDL_SCANCODE_F]) // Down
 	{
-		//self->position.z -= 0.01;
-		self->rotation.x -= 1;
-		//gf3d_vgraphics_rotate_camera(-0.001, self->position);
-	}
-
-	if (vector3d_magnitude(self->velocity) > 0.001)
-	{
-		vector3d_add(self->position, self->position, self->velocity);
-		vector3d_scale(self->velocity, self->velocity, 0.1);
-	}
-	else
-	{
-		if (vector3d_magnitude(self->velocity) < 0.001)
-		{
-			vector3d_clear(self->velocity);
-		}
 
 	}
 	
-	
-	Matrix4 move, rotation, temp;
+	// Rotation for weapon
+	Matrix4 shove, rotation, temp;
 	gfc_matrix_identity(self->modelMatrix);
+
 	gfc_matrix_rotate(
-		rotation,
-		self->modelMatrix,
-		self->rotation.z,
-		vector3d(0, 0, 1));
+	rotation,
+	self->modelMatrix,
+	self->rotation.z,
+	vector3d(0, 0, 1));
+
 	gfc_matrix_rotate(
-		temp,
-		rotation,
-		self->rotation.y,
-		vector3d(0, 0, 1));
+	temp,
+	rotation,
+	self->rotation.y,
+	vector3d(0, 0, 1));
+
 	gfc_matrix_rotate(
-		rotation,
-		temp,
-		self->rotation.x,
-		vector3d(0, 0, 1));
-	gfc_matrix_make_translation(move, self->position);
-	gfc_matrix_multiply(self->modelMatrix, move, rotation);
+	rotation,
+	temp,
+	self->rotation.x,
+	vector3d(0, 0, 1));
+
+	gfc_matrix_make_translation(shove, self->position);
+	gfc_matrix_multiply(self->modelMatrix, shove, rotation);
 	/**/
-
-
-	Vector3D WeaponPos = self->position;
-	WeaponPos.y -= 12;
-	WeaponPos.x += 1;
-	WeaponPos.z -= 1;
-	gfc_matrix_make_translation(self->modelMatrix, WeaponPos);
-
 
 	/*
 	Entity *ent;
@@ -197,7 +189,9 @@ Entity *player_spawn(Vector3D pos, const char *modelName)
 	// Load model
 	self->model = gf3d_model_load(modelName);
 
-	self->radius = 3;
+	self->rotCurrent = -M_PI;
+
+	self->radius = 2;
 
 	// Set vectors
 	vector3d_copy(self->position, pos);

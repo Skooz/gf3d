@@ -12,8 +12,7 @@ typedef struct
 
 static EntityManager gf3d_entity = { 0 };
 
-void gf3d_entity_free(Entity *entity); // Declare early; used in entity close
-
+// Close the entity system
 void gf3d_entity_close()
 {
 	int i;
@@ -29,6 +28,7 @@ void gf3d_entity_close()
 	slog("Entity system closed");
 }
 
+// Initialize the entity system with param: maxEntities
 void gf3d_entity_init(Uint32 maxEntities)
 {
 	if (gf3d_entity.entity_list != NULL)
@@ -48,6 +48,7 @@ void gf3d_entity_init(Uint32 maxEntities)
 	slog("Entity system initialized");
 }
 
+// Free an entity with param: entity
 void gf3d_entity_free(Entity *entity)
 {
 	if (!entity) return;
@@ -56,6 +57,7 @@ void gf3d_entity_free(Entity *entity)
 	memset(entity, 0, sizeof(Entity));
 }
 
+// Create a new entity
 Entity *gf3d_entity_new()
 {
 	int i;
@@ -72,6 +74,7 @@ Entity *gf3d_entity_new()
 	return NULL;
 }
 
+// Call the entity's think function (if they have one)
 void gf3d_entity_think(Entity *self)
 {
 	if (!self) return;
@@ -81,6 +84,7 @@ void gf3d_entity_think(Entity *self)
 	gf3d_entity_collide_check(self);
 }
 
+// Call think functions for each entity
 void gf3d_entity_think_all()
 {
 	int i;
@@ -92,6 +96,7 @@ void gf3d_entity_think_all()
 	}
 }
 
+// Draw the entity
 void gf3d_entity_draw(Entity *self, Uint32 bufferFrame, VkCommandBuffer commandBuffer)
 {
 	if (!self) return;
@@ -100,6 +105,7 @@ void gf3d_entity_draw(Entity *self, Uint32 bufferFrame, VkCommandBuffer commandB
 	gf3d_model_draw(self->model, bufferFrame, commandBuffer, self->modelMatrix);
 }
 
+// Draw each entity
 void gf3d_entity_draw_all(Uint32 bufferFrame, VkCommandBuffer commandBuffer)
 {
 	int i;
@@ -111,6 +117,7 @@ void gf3d_entity_draw_all(Uint32 bufferFrame, VkCommandBuffer commandBuffer)
 	}
 }
 
+// Determine if entities are colliding, call the entity's touch function if they are
 void gf3d_entity_collide(Entity *e1, Entity *e2)
 {
 	if (collide_circle(e1->position, e1->radius, e2->position, e2->radius))
@@ -122,11 +129,12 @@ void gf3d_entity_collide(Entity *e1, Entity *e2)
 	}
 }
 
+// For each entity, check if a collision is occurring
 void gf3d_entity_collide_check(Entity *ent)
 {
 	int i;
 	if (!ent) return;
-	for (i = 0; i < gf3d_entity.entity_count; i++)
+	for (int i = 0; i < gf3d_entity.entity_count; i++)
 	{
 		if (!gf3d_entity.entity_list[i]._inuse) continue;
 		if (&gf3d_entity.entity_list[i] == ent) continue;
