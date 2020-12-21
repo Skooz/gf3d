@@ -1,6 +1,7 @@
 #include "simple_logger.h"
 #include "collision.h"
 #include "monster.h"
+#include "drops.h"
 
 void monster_think(Entity *self)
 {
@@ -74,6 +75,7 @@ void monster_think(Entity *self)
 
 	if (self->health <= 0)
 	{
+		drop_spawn(self->position, self->monsterType);
 		gf3d_entity_free(self);
 	}
 

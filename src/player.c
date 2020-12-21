@@ -3,6 +3,7 @@
 #include "player.h"
 #include "collision.h"
 #include "fireball.h"
+#include "simple_json.h"
 
 Uint8 *keys;
 Vector2D forward;
@@ -63,22 +64,25 @@ void player_think(Entity *self)
 			player_print_stats(self);
 			wait = SDL_GetTicks() + delay;
 		}
-		if (keys[SDL_SCANCODE_F2]) // Upgrade health
+		if (keys[SDL_SCANCODE_F2] && self->exp >= 10) // Upgrade health
 		{
+			self->exp -= 10;
 			self->maxHealth += 10;
 			slog("\nHealth Upgraded (+10)");
 			player_print_stats(self);
 			wait = SDL_GetTicks() + delay;
 		}
-		if (keys[SDL_SCANCODE_F3]) // Upgrade mana
+		if (keys[SDL_SCANCODE_F3] && self->exp >= 10) // Upgrade mana
 		{
+			self->exp -= 10;
 			self->maxMana += 10;
 			slog("\nMana Upgraded (+10)");
 			player_print_stats(self);
 			wait = SDL_GetTicks() + delay;
 		}
-		if (keys[SDL_SCANCODE_F4]) // Upgrade stamina
+		if (keys[SDL_SCANCODE_F4] && self->exp >= 10) // Upgrade stamina
 		{
+			self->exp -= 10;
 			self->maxStamina += 10;
 			slog("\nMana Upgraded (+10)");
 			player_print_stats(self);
@@ -256,7 +260,7 @@ void player_draw_sword(Entity *self, Uint32 bufferFrame, VkCommandBuffer command
 Entity *player_spawn(Vector3D pos, const char *modelName)
 {
 	Entity *self;
-	
+
 	self = gf3d_entity_new();
 	if (!self)
 	{
@@ -266,13 +270,6 @@ Entity *player_spawn(Vector3D pos, const char *modelName)
 
 	// Stats
 	self->isPlayer = 1;
-	self->health	= 100;
-	self->maxHealth = self->health;
-	self->mana		= 100;
-	self->maxMana	= self->mana;
-	self->stamina	= 100;
-	self->maxStamina = self->stamina;
-	self->exp		= 0;
 	self->radius	= 2;
 
 	// Set think
@@ -292,7 +289,88 @@ Entity *player_spawn(Vector3D pos, const char *modelName)
 	gfc_matrix_make_translation(self->modelMatrix, self->position);
 	self->rotCurrent = -M_PI;
 	
-	return self;
+
+	// Load state
+	SJson* file;
+	SJson* tempJson;
+	SJson* tempJsonValue;
+	file = sj_load("saves/player.json");
+
+	if (!file)
+	{
+		self->health = 100;
+		self->maxHealth = self->health;
+		self->mana = 100;
+		self->maxMana = self->mana;
+		self->stamina = 100;
+		self->maxStamina = self->stamina;
+		self->exp = 0;
+		return self;
+	}
+	else
+	{
+		tempJson = sj_object_get_value(file, "stats");
+		if (tempJson) // Load stuff!
+		{
+			tempJsonValue = sj_array_get_nth(tempJson, 0);
+			if (tempJsonValue)
+			{
+				sj_get_float_value(tempJsonValue, &self->health);
+			}
+			tempJsonValue = sj_array_get_nth(tempJson, 1);
+			if (tempJsonValue)
+			{
+				sj_get_float_value(tempJsonValue, &self->maxHealth);
+			}
+			tempJsonValue = sj_array_get_nth(tempJson, 2);
+			if (tempJsonValue)
+			{
+				sj_get_float_value(tempJsonValue, &self->mana);
+			}
+			tempJsonValue = sj_array_get_nth(tempJson, 3);
+			if (tempJsonValue)
+			{
+				sj_get_float_value(tempJsonValue, &self->maxMana);
+			}
+			tempJsonValue = sj_array_get_nth(tempJson, 4);
+			if (tempJsonValue)
+			{
+				sj_get_float_value(tempJsonValue, &self->stamina);
+			}
+			tempJsonValue = sj_array_get_nth(tempJson, 5);
+			if (tempJsonValue)
+			{
+				sj_get_float_value(tempJsonValue, &self->maxStamina);
+			}
+			tempJsonValue = sj_array_get_nth(tempJson, 6);
+			if (tempJsonValue)
+			{
+				sj_get_float_value(tempJsonValue, &self->exp);
+			}
+		}
+		return self;
+	}
+}
+
+void player_save(Entity *self, char* saveFile)
+{
+	SJson* file;
+	SJson* tempJson;
+	SJson* tempJsonValue;
+
+	file = sj_object_new();
+	tempJson = sj_array_new();
+	sj_array_append(tempJson, sj_new_float(self->health));
+	sj_array_append(tempJson, sj_new_float(self->maxHealth));
+	sj_array_append(tempJson, sj_new_float(self->mana));
+	sj_array_append(tempJson, sj_new_float(self->maxMana));
+	sj_array_append(tempJson, sj_new_float(self->stamina));
+	sj_array_append(tempJson, sj_new_float(self->maxStamina));
+	sj_array_append(tempJson, sj_new_float(self->exp));
+
+	sj_object_insert(file, "stats", tempJson);
+
+	sj_save(file, saveFile);
 }
 
 /*eol@eof*/

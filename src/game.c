@@ -114,7 +114,11 @@ int main(int argc,char *argv[])
 
         gf3d_vgraphics_render_end(bufferFrame);
 
-        if (keys[SDL_SCANCODE_ESCAPE])done = 1; // exit condition
+		if (keys[SDL_SCANCODE_ESCAPE])
+		{
+			player_save(player, "saves/player.json");
+			done = 1; // exit condition
+		}
     }    
     
     vkDeviceWaitIdle(gf3d_vgraphics_get_default_logical_device());    
