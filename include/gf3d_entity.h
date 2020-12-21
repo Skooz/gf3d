@@ -33,16 +33,41 @@ typedef struct Entity_S
 	float rotCurrent;
 	float rotTarget;
 	
-	int health;
-	int mana;
-	int stamina;
-
-
-
 	// Monsters
 	int			monsterType;
 	Uint32		nextMove;
 	int			moveDir;
+
+	// Stats
+	float health;
+	float mana;
+	float stamina;
+	float exp;
+
+	/*
+	gf3d_vgraphics_setubo(Matrix4 current)
+	{
+		gfc_matrix_copy(
+			gf3d_vgraphics.ubo.view,
+			current);
+	}
+	
+
+	// Move Camera
+	void gf3d_vgraphics_move_camera(Vector3D move)
+	{
+		Vector3D camPosition = move;
+		camPosition.y -= 15;
+		//camPosition.z += 2;
+
+		gfc_matrix_view(
+		gf3d_vgraphics.ubo.view,
+		camPosition,
+		move,
+		vector3d(0, 0, 1)
+		);
+	}
+	*/
 
 }Entity;
 

@@ -23,6 +23,7 @@ int main(int argc,char *argv[])
     const Uint8 * keys;
     Uint32 bufferFrame = 0;
     VkCommandBuffer commandBuffer;
+	int mousex, mousey;
 
     Model *model;
     Matrix4 modelMat;
@@ -62,7 +63,6 @@ int main(int argc,char *argv[])
 	Entity *player = player_spawn(vector3d(0,-400,0), "sword");
 	Entity *level = level_spawn(vector3d(0, 0, -5), "level");
 
-	
 	Entity *m1, *m2, *m3, *m4, *m5;
 	m1 = monster_spawn(vector3d(-30,-380,0), "cone", 1);
 	m2 = monster_spawn(vector3d(-20, -360, 0), "cube", 2);
@@ -70,50 +70,46 @@ int main(int argc,char *argv[])
 	m4 = monster_spawn(vector3d(20, -330, 0), "sphere", 4);
 	m5 = monster_spawn(vector3d(40, -320, 0), "tube", 5);
 
-	Vector3D OldPos;
-
-	int x, y;
+	
     while(!done)
     {
         SDL_PumpEvents();   // update SDL's internal event structures
 
         keys = SDL_GetKeyboardState(NULL); // get the keyboard state for this frame
-		mouse = SDL_GetMouseState(&x, &y);
+		mouse = SDL_GetMouseState(&mousex, &mousey);
 		//slog("%i", num2);
 
 		//update game things here
 		// Entities
 		gf3d_entity_think_all();
 
-		// Camera
-		//
-		
-
-		//slog("x%f, y%f, z%f", player->position.x, player->position.y, player->position.z);
-
-
-
         // configure render command for graphics command pool
+		bufferFrame = gf3d_vgraphics_render_begin();
         // for each mesh, get a command and configure it from the pool
-        bufferFrame = gf3d_vgraphics_render_begin();
-        gf3d_pipeline_reset_frame(gf3d_vgraphics_get_graphics_pipeline(),bufferFrame);
-            commandBuffer = gf3d_command_rendering_begin(bufferFrame);
+			gf3d_pipeline_reset_frame(gf3d_vgraphics_get_graphics_model_pipeline(), bufferFrame);
+			gf3d_pipeline_reset_frame(gf3d_vgraphics_get_graphics_overlay_pipeline(),bufferFrame);
 
+			commandBuffer = gf3d_command_rendering_begin(bufferFrame, gf3d_vgraphics_get_graphics_model_pipeline());
 				gf3d_entity_draw_all(bufferFrame, commandBuffer);
-                
             gf3d_command_rendering_end(commandBuffer);
-            
+        
+		// 2D overlay rendering
+			commandBuffer = gf3d_command_rendering_begin(bufferFrame, gf3d_vgraphics_get_graphics_overlay_pipeline());
+
+				//gf3d_sprite_draw(hud, vector2d(0,0), vector2d(2,2), 0, bufferFrame, commandBuffer);
+				//gf3d_sprite_draw(mouse, vector2d(mousex, mousey), vector2d(1, 1), mouseFrame, bufferFrame, commandBuffer);
+
+			//gf3d_command_rendering_end(commandBuffer);
+
         gf3d_vgraphics_render_end(bufferFrame);
 
         if (keys[SDL_SCANCODE_ESCAPE])done = 1; // exit condition
     }    
     
     vkDeviceWaitIdle(gf3d_vgraphics_get_default_logical_device());    
-  
 	//cleanup
     slog("gf3d program end");
     slog_sync();
-
     return 0;
 }
 

@@ -15,16 +15,14 @@ void player_think(Entity *self)
 	Uint8 *keys;
 	keys = SDL_GetKeyboardState(NULL);
 
-	Vector3D move = vector3d(keys[SDL_SCANCODE_D] - keys[SDL_SCANCODE_A], keys[SDL_SCANCODE_W] - keys[SDL_SCANCODE_S], 0);
+	Vector3D move = vector3d(keys[SDL_SCANCODE_E] - keys[SDL_SCANCODE_Q], keys[SDL_SCANCODE_W] - keys[SDL_SCANCODE_S], 0);
 	Vector2D forward;
-	//rotate the forward direction based on current rotation
 	forward.x = (move.x * SDL_cosf(self->rotCurrent)) - (move.y * SDL_sinf(self->rotCurrent));
 	forward.y = (move.x * SDL_sinf(self->rotCurrent)) + (move.y * SDL_cosf(self->rotCurrent));
-	
 	self->position.x -= forward.x * 0.02;
 	self->position.y -= forward.y * 0.02;
-
 	//self->rotCurrent = SDL_fmodf(self->rotCurrent, 6.28319);
+
 	player_update_camera(vector3d(self->position.x, self->position.y, self->position.z), vector3d(0, self->rotHeight, self->rotCurrent));
 
 	if (keys[SDL_SCANCODE_W]) // Forward
@@ -35,99 +33,50 @@ void player_think(Entity *self)
 	{
 		//self->velocity.y -= 0.01;
 	}
-	if (keys[SDL_SCANCODE_A]) // Left
+	if (keys[SDL_SCANCODE_A]) // Turn Left
 	{
 		//self->velocity.x -= 0.01;
 		self->rotCurrent += 0.0015;
 		self->rotation.z += 0.0015;
 	}
-	if (keys[SDL_SCANCODE_D]) // Right
+	if (keys[SDL_SCANCODE_D]) // Turn Right
 	{
 		//self->velocity.x += 0.01;
 		self->rotCurrent -= 0.0015;
 		self->rotation.z -= 0.0015;
 	}
-	if (keys[SDL_SCANCODE_R]) // Up
+	if (keys[SDL_SCANCODE_Q]) // Turn Left
 	{
 		
 	}
-	if (keys[SDL_SCANCODE_F]) // Down
+	if (keys[SDL_SCANCODE_E]) // Turn Right
 	{
-
+		
 	}
 	
 	// Rotation for weapon
 	Matrix4 shove, rotation, temp;
 	gfc_matrix_identity(self->modelMatrix);
-
 	gfc_matrix_rotate(
-	rotation,
-	self->modelMatrix,
-	self->rotation.z,
-	vector3d(0, 0, 1));
-
+		rotation,
+		self->modelMatrix,
+		self->rotation.z,
+		vector3d(0, 0, 1));
 	gfc_matrix_rotate(
-	temp,
-	rotation,
-	self->rotation.y,
-	vector3d(0, 0, 1));
-
+		temp,
+		rotation,
+		self->rotation.y,
+		vector3d(0, 0, 1));
 	gfc_matrix_rotate(
-	rotation,
-	temp,
-	self->rotation.x,
-	vector3d(0, 0, 1));
-
+		rotation,
+		temp,
+		self->rotation.x,
+		vector3d(0, 0, 1));
 	gfc_matrix_make_translation(shove, self->position);
 	gfc_matrix_multiply(self->modelMatrix, shove, rotation);
-	/**/
-
-	/*
-	Entity *ent;
-
-	gfc_matrix_rotate(
-	self->modelMatrix,
-	self->modelMatrix,
-	0.002,
-	vector3d(1, 0, 0)
-	);
-
-	//ent 1 stuff - MAKE MANY AGUMON
 
 
-	self->delay++;
-	if (self->delay == 1000)
-	{
-	ent = gf3d_entity_new();
-	if (ent)
-	{
-	ent->model = gf3d_model_load("dino");
-	ent->think = dino_think;
-	gfc_matrix_make_translation(
-	ent->modelMatrix,
-	vector3d(gfc_crandom() * 5, gfc_crandom() * 5, gfc_crandom() * 5));
-	gfc_matrix_rotate(
-	ent->modelMatrix,
-	ent->modelMatrix,
-	gfc_crandom()*0.01,
-	vector3d(gfc_crandom() * 5, gfc_crandom() * 5, gfc_crandom() * 5));
-	}
-	if (self->delay == 2000)
-	{
-	gf3d_entity_free(self);
-	return;
-	}
-	}
-	*/
-
-	/*gfc_matrix_make_translation(
-		self->modelMatrix,
-		vector3d(gfc_crandom() * 5, gfc_crandom() * 5, gfc_crandom() * 5));
-	gfc_matrix_rotate(
-		self->modelMatrix,
-		self->modelMatrix,
-		gfc_crandom()*0.01,
-		vector3d(gfc_crandom() * 5, gfc_crandom() * 5, gfc_crandom() * 5));*/
+	
 
 }
 
@@ -186,30 +135,28 @@ Entity *player_spawn(Vector3D pos, const char *modelName)
 		return NULL;
 	}
 
-	// Load model
-	self->model = gf3d_model_load(modelName);
-
-	self->rotCurrent = -M_PI;
-
-	self->radius = 2;
-
-	// Set vectors
-	vector3d_copy(self->position, pos);
-	vector3d_set(self->rotation, 0, 0, 0);
-
-	// Set init camera pos
-	gf3d_vgraphics_move_camera(self->position);
-	gfc_matrix_make_translation(self->modelMatrix, self->position);
+	// Stats
+	self->health	= 100;
+	self->mana		= 100;
+	self->stamina	= 100;
+	self->exp		= 0;
+	self->radius	= 1;
 
 	// Set think
 	self->think = player_think;
-
 	// Set touch
 	self->touch = player_touch;
-
+	// Load model
+	self->model = gf3d_model_load(modelName);
+	// Set vectors
+	vector3d_copy(self->position, pos);
+	vector3d_set(self->rotation, 0, 0, 0);
+	// Set init camera pos
+	gf3d_vgraphics_move_camera(self->position);
+	gfc_matrix_make_translation(self->modelMatrix, self->position);
+	self->rotCurrent = -M_PI;
+	
 	return self;
 }
-
-
 
 /*eol@eof*/

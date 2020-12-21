@@ -67,7 +67,7 @@ void gf3d_camera_move(Vector3D move)
 
 void gf3d_camera_update(Vector3D pos, Vector3D rotate)
 {
-	float magicNumber = -4;
+	float magicNumber = -5;
 	float s = SDL_sinf(rotate.z - 2.35619);
 	float c = SDL_cosf(rotate.z - 2.35619);
 	Vector2D cpos;

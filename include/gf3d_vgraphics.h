@@ -8,7 +8,7 @@
 #include "gf3d_pipeline.h"
 #include "gf3d_commands.h"
 
-#define GF3D_VGRAPHICS_DISCRETE 1   //Choosing whether to use discrete [1] or integrated graphics [0]
+#define GF3D_VGRAPHICS_DISCRETE 2   //Choosing whether to use discrete [1] or integrated graphics [0]
 
 /**
  * @brief init Vulkan / SDL, setup device and initialize infrastructure for 3d graphics
@@ -47,7 +47,7 @@ void gf3d_vgraphics_rotate_camera(float degrees);
 VkBuffer gf3d_vgraphics_get_uniform_buffer_by_index(Uint32 index);
 UniformBufferObject gf3d_vgraphics_get_uniform_buffer_object();
 
-Pipeline *gf3d_vgraphics_get_graphics_pipeline();
+//Pipeline *gf3d_vgraphics_get_graphics_pipeline();
 
 Command *gf3d_vgraphics_get_graphics_command_pool();
 

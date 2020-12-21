@@ -5,7 +5,6 @@
 void level_think(Entity *self)
 {
 	
-
 }
 
 Entity *level_spawn(Vector3D position, const char *modelName)
