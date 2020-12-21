@@ -21,6 +21,7 @@ typedef struct Entity_S
 	Vector3D	rotation;
 	float		radius;
 	Model		*model;
+	Model		*animodel;
 	Matrix4		modelMatrix;
 	void(*think)(struct Entity_S *self);
 	void(*touch)(struct Entity_S *self, struct Entity_S *other);
@@ -30,6 +31,7 @@ typedef struct Entity_S
 
 	// Player 
 	int isPlayer;
+	float animFrame;
 	float rotHeight;
 	float rotCurrent;
 	float rotTarget;

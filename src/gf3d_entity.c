@@ -100,6 +100,7 @@ void gf3d_entity_think_all()
 void gf3d_entity_draw(Entity *self, Uint32 bufferFrame, VkCommandBuffer commandBuffer)
 {
 	if (!self) return;
+	if (!self->model) return;
 
 	//void gf3d_model_draw(Model *model,Uint32 bufferFrame,VkCommandBuffer commandBuffer,Matrix4 modelMat);
 	gf3d_model_draw(self->model, bufferFrame, commandBuffer, self->modelMatrix);

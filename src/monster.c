@@ -84,7 +84,10 @@ void monster_touch(Entity *self, Entity *other)
 {
 	if (!self || !other) return;
 
-	
+	if (other->isPlayer)
+	{
+		other->health -= 0.01;
+	}
 }
 
 Entity *monster_spawn(Vector3D position, const char *modelName, int type)

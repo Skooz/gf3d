@@ -13,6 +13,8 @@ Uint32 wait;
 Uint32 delay = 2000;
 // wait = SDL_GetTicks() + delay;
 
+int doAnim;
+
 void player_print_stats(Entity *self)
 {
 	slog("\nHealth: %f/%f\nMana: %f/%f\nStamina: %f/%f\nEXP: %f", self->health, self->maxHealth, self->mana, self->maxMana, self->stamina, self->maxStamina, self->exp);
@@ -101,6 +103,24 @@ void player_think(Entity *self)
 			fireball_spawn(self);
 			wait = SDL_GetTicks() + delay;
 		}
+
+		// SWINGIN' THINGS
+		if (keys[SDL_SCANCODE_V] && doAnim == 0)
+		{
+			doAnim = 1;
+			wait = SDL_GetTicks() + delay/4;
+		}
+	}
+
+	// Sword slice!
+	if (doAnim == 1)
+	{
+		self->animFrame += 0.025;
+		if (self->animFrame >= 12)
+		{
+			self->animFrame = 0;
+			doAnim = 0;
+		}
 	}
 
 	// Movement
@@ -185,7 +205,10 @@ void player_touch(Entity *self, Entity *other)
 
 	//slog("collision");
 
-	//vector3d_copy(self->position, vector3d(0, -400, 0));
+	if (doAnim)
+	{
+		other->health -= 1;
+	}
 }
 
 
@@ -223,6 +246,13 @@ Uint8 object_bounds(Vector3D center, float radius, Vector2D *normal)
 */
 
 
+void player_draw_sword(Entity *self, Uint32 bufferFrame, VkCommandBuffer commandBuffer, Uint32 frame)
+{
+	if (!self) return;
+
+	gf3d_model_draw_animated(self->animodel, bufferFrame, commandBuffer, self->modelMatrix, (Uint32)frame);
+}
+
 Entity *player_spawn(Vector3D pos, const char *modelName)
 {
 	Entity *self;
@@ -243,14 +273,17 @@ Entity *player_spawn(Vector3D pos, const char *modelName)
 	self->stamina	= 100;
 	self->maxStamina = self->stamina;
 	self->exp		= 0;
-	self->radius	= 1;
+	self->radius	= 2;
 
 	// Set think
 	self->think = player_think;
 	// Set touch
 	self->touch = player_touch;
 	// Load model
-	self->model = gf3d_model_load(modelName);
+	//self->model = gf3d_model_load(modelName);
+	self->animodel = gf3d_model_load_animated("sword_anim", 1, 13);
+	self->animFrame = 1;
+	doAnim = 0;
 	// Set vectors
 	vector3d_copy(self->position, pos);
 	vector3d_set(self->rotation, 0, 0, 0);

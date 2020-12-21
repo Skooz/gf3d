@@ -31,13 +31,6 @@ int main(int argc,char *argv[])
 	Sprite *mouse = NULL;
 	Sprite *hud = NULL;
 
-	/*
-    Model *model;
-    Matrix4 modelMat;
-    Model *model2;
-    Matrix4 modelMat2;
-    */
-
     for (a = 1; a < argc;a++)
     {
         if (strcmp(argv[a],"-disable_validate") == 0)
@@ -73,6 +66,16 @@ int main(int argc,char *argv[])
 
 	mouse = gf3d_sprite_load("images/pointer.png", 32, 32, 16);
 
+	Model *model = NULL;
+	Matrix4 modelMat;
+	model = gf3d_model_load_animated("sword_anim", 1, 13);
+	gfc_matrix_identity(modelMat);
+	gfc_matrix_rotate(
+		modelMat,
+		modelMat,
+		M_PI / 2,
+		vector3d(1, 0, 0));
+
 	// main game loop
 	slog("gf3d main loop begin");
 	slog_sync();
@@ -82,8 +85,8 @@ int main(int argc,char *argv[])
 
         keys = SDL_GetKeyboardState(NULL); // get the keyboard state for this frame
 		SDL_GetMouseState(&mousex, &mousey);
-			frame = frame + 0.00001;
-			if (frame >= 24)frame = 0;
+			frame = frame + 0.05;
+			if (frame >= 12)frame = 0;
 			mouseFrame = (mouseFrame + 1) % 16;
 
 		//update game things here
@@ -98,7 +101,10 @@ int main(int argc,char *argv[])
 
 			commandBuffer = gf3d_command_rendering_begin(bufferFrame, gf3d_vgraphics_get_graphics_model_pipeline());
 				gf3d_entity_draw_all(bufferFrame, commandBuffer);
-            gf3d_command_rendering_end(commandBuffer);
+				//gf3d_model_draw_animated(model, bufferFrame, commandBuffer, modelMat, (Uint32)frame);
+				player_draw_sword(player, bufferFrame, commandBuffer, player->animFrame);
+
+			gf3d_command_rendering_end(commandBuffer);
         
 		// 2D overlay rendering
 			commandBuffer = gf3d_command_rendering_begin(bufferFrame, gf3d_vgraphics_get_graphics_overlay_pipeline());
