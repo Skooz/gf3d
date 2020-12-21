@@ -72,6 +72,11 @@ void monster_think(Entity *self)
 			break;
 	}
 
+	if (self->health <= 0)
+	{
+		gf3d_entity_free(self);
+	}
+
 	gfc_matrix_make_translation(self->modelMatrix, self->position);
 }
 
@@ -79,9 +84,7 @@ void monster_touch(Entity *self, Entity *other)
 {
 	if (!self || !other) return;
 
-	self->velocity.x = 0;
-	self->velocity.y = 0;
-	self->velocity.z = 0;
+	
 }
 
 Entity *monster_spawn(Vector3D position, const char *modelName, int type)
@@ -95,15 +98,15 @@ Entity *monster_spawn(Vector3D position, const char *modelName, int type)
 		return NULL;
 	}
 
+	ent->health = 1;
+
 	ent->nextMove = 0;
 	ent->monsterType = type;
 	ent->moveDir = 1;
 
-	ent->radius = 5;
+	ent->radius = 4;
 
 	ent->touch = monster_touch;
-
-	
 
 	// Load model
 	ent->model = gf3d_model_load(modelName);

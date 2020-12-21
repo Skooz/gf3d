@@ -2,60 +2,162 @@
 #include "gf3d_vgraphics.h"
 #include "player.h"
 #include "collision.h"
+#include "fireball.h"
 
+Uint8 *keys;
+Vector2D forward;
+Vector3D move;
+float moveSpeed = 0.02;
+Matrix4 shove, rotation, temp;
+Uint32 wait;
+Uint32 delay = 2000;
+// wait = SDL_GetTicks() + delay;
 
-void player_update_camera(Vector3D move, Vector3D rotate)
+void player_print_stats(Entity *self)
 {
-	gf3d_camera_update(move, rotate);
+	slog("\nHealth: %f/%f\nMana: %f/%f\nStamina: %f/%f\nEXP: %f", self->health, self->maxHealth, self->mana, self->maxMana, self->stamina, self->maxStamina, self->exp);
 }
 
 void player_think(Entity *self)
 {
-	// Movement
-	Uint8 *keys;
 	keys = SDL_GetKeyboardState(NULL);
 
-	Vector3D move = vector3d(keys[SDL_SCANCODE_E] - keys[SDL_SCANCODE_Q], keys[SDL_SCANCODE_W] - keys[SDL_SCANCODE_S], 0);
-	Vector2D forward;
+	// Passive Stat Regen
+	if (SDL_GetTicks() % 1000 == 0)
+	{
+		self->exp += 1;
+		
+		if (self->mana < self->maxMana)
+		{
+			self->mana += 2;
+		}
+		if (self->stamina < self->maxStamina)
+		{
+			self->stamina += 2;
+		}
+	}
+
+	// Stat correction
+	if (self->health > self->maxHealth)
+		self->health = self->maxHealth;
+	if (self->health < 0)
+		// you're dead anyways lmao
+	if (self->mana > self->maxMana)
+		self->mana = self->maxMana;
+	if (self->mana < 0)
+		self->mana = 0;
+	if (self->stamina > self->maxStamina)
+		self->stamina = self->maxStamina;
+	if (self->stamina < 0)
+		self->stamina = 0;
+
+
+	// Additional inputs
+	if (wait < SDL_GetTicks()) // Anti input spam
+	{
+		// leveling
+		if (keys[SDL_SCANCODE_F1]) // Display stats
+		{
+			player_print_stats(self);
+			wait = SDL_GetTicks() + delay;
+		}
+		if (keys[SDL_SCANCODE_F2]) // Upgrade health
+		{
+			self->maxHealth += 10;
+			slog("\nHealth Upgraded (+10)");
+			player_print_stats(self);
+			wait = SDL_GetTicks() + delay;
+		}
+		if (keys[SDL_SCANCODE_F3]) // Upgrade mana
+		{
+			self->maxMana += 10;
+			slog("\nMana Upgraded (+10)");
+			player_print_stats(self);
+			wait = SDL_GetTicks() + delay;
+		}
+		if (keys[SDL_SCANCODE_F4]) // Upgrade stamina
+		{
+			self->maxStamina += 10;
+			slog("\nMana Upgraded (+10)");
+			player_print_stats(self);
+			wait = SDL_GetTicks() + delay;
+		}
+
+		// heal
+		if (keys[SDL_SCANCODE_H] && self->mana > 10 && (self->maxHealth-self->health) >= 10)
+		{
+			slog("Healed! +10 HP. -10 Mana.");
+			self->health += 10;
+			self->mana -= 10;
+			player_print_stats(self);
+			wait = SDL_GetTicks() + delay;
+		}
+
+		// BURN, BABY
+		if (keys[SDL_SCANCODE_F] && self->mana > 10)
+		{
+			slog("SWOOSH!!!");
+			self->mana -= 10;
+			fireball_spawn(self);
+			wait = SDL_GetTicks() + delay;
+		}
+	}
+
+	// Movement
+	move = vector3d(keys[SDL_SCANCODE_E] - keys[SDL_SCANCODE_Q], keys[SDL_SCANCODE_W] - keys[SDL_SCANCODE_S], 0);
 	forward.x = (move.x * SDL_cosf(self->rotCurrent)) - (move.y * SDL_sinf(self->rotCurrent));
 	forward.y = (move.x * SDL_sinf(self->rotCurrent)) + (move.y * SDL_cosf(self->rotCurrent));
-	self->position.x -= forward.x * 0.02;
-	self->position.y -= forward.y * 0.02;
+	self->position.x -= forward.x * moveSpeed;
+	self->position.y -= forward.y * moveSpeed;
 	//self->rotCurrent = SDL_fmodf(self->rotCurrent, 6.28319);
 
-	player_update_camera(vector3d(self->position.x, self->position.y, self->position.z), vector3d(0, self->rotHeight, self->rotCurrent));
+	gf3d_camera_update(vector3d(self->position.x, self->position.y, self->position.z), vector3d(0, self->rotHeight, self->rotCurrent));
+
+	// Sprint
+	if (keys[SDL_SCANCODE_LSHIFT] && self->stamina > 5)
+	{
+		self->stamina -= 0.015;
+		moveSpeed = 0.04;
+	}
+	if (!keys[SDL_SCANCODE_LSHIFT] || self->stamina < 5)
+	{
+		moveSpeed = 0.02;
+	}
 
 	if (keys[SDL_SCANCODE_W]) // Forward
 	{
-		//self->velocity.y += 0.01;
+		
 	}
 	if (keys[SDL_SCANCODE_S]) // Backward
 	{
-		//self->velocity.y -= 0.01;
+		
 	}
 	if (keys[SDL_SCANCODE_A]) // Turn Left
 	{
-		//self->velocity.x -= 0.01;
 		self->rotCurrent += 0.0015;
 		self->rotation.z += 0.0015;
 	}
 	if (keys[SDL_SCANCODE_D]) // Turn Right
 	{
-		//self->velocity.x += 0.01;
 		self->rotCurrent -= 0.0015;
 		self->rotation.z -= 0.0015;
 	}
-	if (keys[SDL_SCANCODE_Q]) // Turn Left
+
+	// Gliding (jumping)
+	if (keys[SDL_SCANCODE_SPACE] && self->mana > 5)
 	{
-		
+		self->mana -= 0.015;
+		self->position.z += 0.0025;
 	}
-	if (keys[SDL_SCANCODE_E]) // Turn Right
+	if (!keys[SDL_SCANCODE_SPACE] && self->position.z > 0 || self->mana < 5)
 	{
-		
+		self->position.z -= 0.0025;
 	}
+	// floor correction
+	if (self->position.z < 0)
+		self->position.z = 0;
 	
 	// Rotation for weapon
-	Matrix4 shove, rotation, temp;
 	gfc_matrix_identity(self->modelMatrix);
 	gfc_matrix_rotate(
 		rotation,
@@ -75,16 +177,13 @@ void player_think(Entity *self)
 	gfc_matrix_make_translation(shove, self->position);
 	gfc_matrix_multiply(self->modelMatrix, shove, rotation);
 
-
-	
-
 }
 
 void player_touch(Entity *self, Entity *other)
 {
 	if (!self || !other) return;
 
-	slog("collision");
+	//slog("collision");
 
 	//vector3d_copy(self->position, vector3d(0, -400, 0));
 }
@@ -136,9 +235,13 @@ Entity *player_spawn(Vector3D pos, const char *modelName)
 	}
 
 	// Stats
+	self->isPlayer = 1;
 	self->health	= 100;
+	self->maxHealth = self->health;
 	self->mana		= 100;
+	self->maxMana	= self->mana;
 	self->stamina	= 100;
+	self->maxStamina = self->stamina;
 	self->exp		= 0;
 	self->radius	= 1;
 

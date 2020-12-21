@@ -61,7 +61,7 @@ int main(int argc,char *argv[])
 	// START ENTITIES
 	gf3d_entity_init(1024);
 
-	Entity *player = player_spawn(vector3d(0,-400,0), "sword");
+	Entity *player = player_spawn(vector3d(0 ,-400, 0), "sword");
 	Entity *level = level_spawn(vector3d(0, 0, -5), "level");
 
 	Entity *m1, *m2, *m3, *m4, *m5;
@@ -82,7 +82,7 @@ int main(int argc,char *argv[])
 
         keys = SDL_GetKeyboardState(NULL); // get the keyboard state for this frame
 		SDL_GetMouseState(&mousex, &mousey);
-			frame = frame + 0.001;
+			frame = frame + 0.00001;
 			if (frame >= 24)frame = 0;
 			mouseFrame = (mouseFrame + 1) % 16;
 

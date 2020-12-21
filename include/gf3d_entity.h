@@ -29,6 +29,7 @@ typedef struct Entity_S
 	Uint32		delay;
 
 	// Player 
+	int isPlayer;
 	float rotHeight;
 	float rotCurrent;
 	float rotTarget;
@@ -40,8 +41,11 @@ typedef struct Entity_S
 
 	// Stats
 	float health;
+	float maxHealth;
 	float mana;
+	float maxMana;
 	float stamina;
+	float maxStamina;
 	float exp;
 
 }Entity;
