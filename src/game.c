@@ -31,6 +31,7 @@ int main(int argc,char *argv[])
 	Uint32 mouseFrame = 0;
 	Sprite *mouse = NULL;
 	Sprite *hud = NULL;
+	Sprite *mainmenu = NULL;
 
     for (a = 1; a < argc;a++)
     {
@@ -56,7 +57,19 @@ int main(int argc,char *argv[])
 	gf3d_entity_init(1024);
 	gf3d_particle_init(1024);
 
-	Particle *sperkler = sparkle_spawner(vector3d(0,-300,-3), "cone");
+	// 0 - cone, 1 - cube, 2-diamond, 3-sphere, 4-tube
+	Particle *sperkler = sparkle_spawner(vector3d(0,-200,-3), "cone", 0);
+	Entity *f1 = fountain_spawn(vector3d(0, -200, -3), 0);
+
+	Particle *sperkler2 = sparkle_spawner(vector3d(25, -200, -3), "cube", 1);
+	Entity *f2 = fountain_spawn(vector3d(50, -200, -3), 0);
+
+	Particle *sperkler3 = sparkle_spawner(vector3d(-25, -200, -3), "sphere", 3);
+	Entity *f3 = fountain_spawn(vector3d(-50, -200, -3), 0);
+
+	Particle *sperkler4 = sparkle_spawner(vector3d(50, -200, -3), "tube", 4);
+	Entity *f4 = fountain_spawn(vector3d(100, -200, -3), 0);
+
 	Entity *player = player_spawn(vector3d(0 ,-400, 0), "sword");
 	Entity *level = level_spawn(vector3d(0, 0, -5), "level");
 
@@ -68,6 +81,7 @@ int main(int argc,char *argv[])
 	m5 = monster_spawn(vector3d(40, -320, 0), "tube", 5);
 
 	mouse = gf3d_sprite_load("images/pointer.png", 32, 32, 16);
+	hud = gf3d_sprite_load("images/hud.png", -1, -1, 0);
 
 	Model *model = NULL;
 	Matrix4 modelMat;
@@ -113,7 +127,7 @@ int main(int argc,char *argv[])
         
 		// 2D overlay rendering
 			commandBuffer = gf3d_command_rendering_begin(bufferFrame, gf3d_vgraphics_get_graphics_overlay_pipeline());
-				//gf3d_sprite_draw(hud, vector2d(0,0), vector2d(2,2), 0, bufferFrame, commandBuffer);
+				gf3d_sprite_draw(hud, vector2d(0,0), vector2d(2,2), 0, bufferFrame, commandBuffer);
 				gf3d_sprite_draw(mouse, vector2d(mousex, mousey), vector2d(1, 1), mouseFrame, bufferFrame, commandBuffer);
 			gf3d_command_rendering_end(commandBuffer);
 

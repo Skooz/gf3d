@@ -19,7 +19,8 @@ typedef struct Particle_S
 	Vector3D	position;
 	Vector3D	rotation;
 	Uint32		lifetime;
-	//float		radius;
+	float		radius;
+	int			particleType;
 	Model		*model;
 	Matrix4		modelMatrix;
 	void(*think)(struct Particle_S *self);

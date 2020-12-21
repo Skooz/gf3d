@@ -4,6 +4,8 @@
 
 #include "collision.h"
 
+#include "gf3d_entity.h"
+
 typedef struct
 {
 	Particle	*particle_list;	

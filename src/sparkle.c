@@ -29,28 +29,26 @@ Particle *sparkle_spawn(Vector3D position, Uint32 lt, int type)
 	//slog("%f", lt);
 	self->lifetime = lt + SDL_GetTicks();
 
-	slog("%f", self->lifetime);
-
 	// Load model
 	switch (type)
 	{
 	case 0:
-		self->model = gf3d_model_load("cone");
+		self->model = gf3d_model_load("scone");
 		break;
 	case 1:
-		self->model = gf3d_model_load("cube");
+		self->model = gf3d_model_load("scube");
 		break;
 	case 2:
-		self->model = gf3d_model_load("diamond");
+		self->model = gf3d_model_load("sdiamond");
 		break;
 	case 3:
-		self->model = gf3d_model_load("sphere");
+		self->model = gf3d_model_load("ssphere");
 		break;
 	case 4:
-		self->model = gf3d_model_load("tube");
+		self->model = gf3d_model_load("stube");
 		break;
 	case 5:
-		self->model = gf3d_model_load("diamond");
+		self->model = gf3d_model_load("sdiamond");
 		break;
 	}
 
