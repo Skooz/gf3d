@@ -719,7 +719,6 @@ gf3d_vgraphics_setubo(Matrix4 current)
 		current);
 }
 
-
 // Move Camera
 void gf3d_vgraphics_move_camera(Vector3D move)
 {
@@ -734,5 +733,5 @@ void gf3d_vgraphics_move_camera(Vector3D move)
 		vector3d(0, 0, 1)
 		);
 }
-/*eol@eof*/
 
+/*eol@eof*/

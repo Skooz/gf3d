@@ -10,6 +10,7 @@
 #include "gf3d_model.h"
 #include "gf3d_camera.h"
 #include "gf3d_texture.h"
+#include "gf3d_sprite.h"
 
 #include "gf3d_entity.h"
 #include "player.h"
@@ -23,13 +24,20 @@ int main(int argc,char *argv[])
     const Uint8 * keys;
     Uint32 bufferFrame = 0;
     VkCommandBuffer commandBuffer;
+	
 	int mousex, mousey;
+	float frame = 0;
+	Uint32 mouseFrame = 0;
+	Sprite *mouse = NULL;
+	Sprite *hud = NULL;
 
+	/*
     Model *model;
     Matrix4 modelMat;
     Model *model2;
     Matrix4 modelMat2;
-    
+    */
+
     for (a = 1; a < argc;a++)
     {
         if (strcmp(argv[a],"-disable_validate") == 0)
@@ -53,13 +61,6 @@ int main(int argc,char *argv[])
 	// START ENTITIES
 	gf3d_entity_init(1024);
 
-    // main game loop
-    slog("gf3d main loop begin");
-	slog_sync();
-
-
-	Uint32 mouse;
-
 	Entity *player = player_spawn(vector3d(0,-400,0), "sword");
 	Entity *level = level_spawn(vector3d(0, 0, -5), "level");
 
@@ -70,14 +71,20 @@ int main(int argc,char *argv[])
 	m4 = monster_spawn(vector3d(20, -330, 0), "sphere", 4);
 	m5 = monster_spawn(vector3d(40, -320, 0), "tube", 5);
 
-	
+	mouse = gf3d_sprite_load("images/pointer.png", 32, 32, 16);
+
+	// main game loop
+	slog("gf3d main loop begin");
+	slog_sync();
     while(!done)
     {
         SDL_PumpEvents();   // update SDL's internal event structures
 
         keys = SDL_GetKeyboardState(NULL); // get the keyboard state for this frame
-		mouse = SDL_GetMouseState(&mousex, &mousey);
-		//slog("%i", num2);
+		SDL_GetMouseState(&mousex, &mousey);
+			frame = frame + 0.001;
+			if (frame >= 24)frame = 0;
+			mouseFrame = (mouseFrame + 1) % 16;
 
 		//update game things here
 		// Entities
@@ -95,11 +102,9 @@ int main(int argc,char *argv[])
         
 		// 2D overlay rendering
 			commandBuffer = gf3d_command_rendering_begin(bufferFrame, gf3d_vgraphics_get_graphics_overlay_pipeline());
-
 				//gf3d_sprite_draw(hud, vector2d(0,0), vector2d(2,2), 0, bufferFrame, commandBuffer);
-				//gf3d_sprite_draw(mouse, vector2d(mousex, mousey), vector2d(1, 1), mouseFrame, bufferFrame, commandBuffer);
-
-			//gf3d_command_rendering_end(commandBuffer);
+				gf3d_sprite_draw(mouse, vector2d(mousex, mousey), vector2d(1, 1), mouseFrame, bufferFrame, commandBuffer);
+			gf3d_command_rendering_end(commandBuffer);
 
         gf3d_vgraphics_render_end(bufferFrame);
 
