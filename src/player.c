@@ -24,12 +24,12 @@ void player_print_stats(Entity *self)
 void player_think(Entity *self)
 {
 	keys = SDL_GetKeyboardState(NULL);
-
+	
 	// Passive Stat Regen
 	if (SDL_GetTicks() % 1000 == 0)
 	{
 		self->exp += 1;
-		
+
 		if (self->mana < self->maxMana)
 		{
 			self->mana += 2;

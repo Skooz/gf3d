@@ -13,6 +13,7 @@
 #include "gf3d_sprite.h"
 
 #include "gf3d_entity.h"
+#include "gf3d_particle.h"
 #include "player.h"
 #include "level.h"
 
@@ -53,7 +54,9 @@ int main(int argc,char *argv[])
 
 	// START ENTITIES
 	gf3d_entity_init(1024);
+	gf3d_particle_init(1024);
 
+	Particle *sperkler = sparkle_spawner(vector3d(0,-300,-3), "cone");
 	Entity *player = player_spawn(vector3d(0 ,-400, 0), "sword");
 	Entity *level = level_spawn(vector3d(0, 0, -5), "level");
 
@@ -92,6 +95,7 @@ int main(int argc,char *argv[])
 		//update game things here
 		// Entities
 		gf3d_entity_think_all();
+		gf3d_particle_think_all();
 
         // configure render command for graphics command pool
 		bufferFrame = gf3d_vgraphics_render_begin();
@@ -101,6 +105,7 @@ int main(int argc,char *argv[])
 
 			commandBuffer = gf3d_command_rendering_begin(bufferFrame, gf3d_vgraphics_get_graphics_model_pipeline());
 				gf3d_entity_draw_all(bufferFrame, commandBuffer);
+				gf3d_particle_draw_all(bufferFrame, commandBuffer);
 				//gf3d_model_draw_animated(model, bufferFrame, commandBuffer, modelMat, (Uint32)frame);
 				player_draw_sword(player, bufferFrame, commandBuffer, player->animFrame);
 
